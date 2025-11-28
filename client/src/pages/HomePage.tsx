@@ -5,7 +5,6 @@ import HeroSection from '../components/features/HeroSection';
 import CardSection from '../components/features/CardSection';
 import Footer from '../components/layouts/Footer';
 import { socialLinks } from '../constants/socialLinks';
-import { ComingSoonButton } from '../components/ui/Button/ComingSoonButton';
 import { ConnectWallet } from '../components/ui/Button/ConnectWallet';
 import logoImage from '../assets/logo.png';
 
@@ -25,6 +24,7 @@ export default function HomePage() {
           actionButton={<ConnectWallet />}
         />
         <HeroSection />
+        
         <CardSection />
         <Footer 
           logoPath={logoImage}

@@ -1,8 +1,4 @@
-interface HeroSectionProps {
-  onLaunchApp?: () => void;
-}
-
-export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
+export default function HeroSection() {
   return (
     <div style={{
       display: 'flex',
@@ -10,7 +6,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
       justifyContent: 'center',
       textAlign: 'center',
       color: 'white',
-      padding: '80px 0 20px', // Changed from '80px 0 1rem' - reduced bottom padding
+      padding: '80px 0 20px',
       position: 'relative',
       zIndex: 1,
       whiteSpace: 'nowrap'
@@ -46,7 +42,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
           alignItems: 'center',
           justifyContent: 'center',
           gap: '0.5rem',
-          marginBottom: '0', // Changed from '3rem' to remove bottom margin
+          marginBottom: '0',
           color: '#d1d5db',
           fontSize: '1.2rem',
           whiteSpace: 'nowrap' 

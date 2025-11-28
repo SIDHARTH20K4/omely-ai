@@ -20,8 +20,8 @@ export default function ConversationList({
     { id: '3', title: 'Design inspiration', mode: 'challenge' },
     { id: '4', title: 'What is machine learning', mode: 'socratic' },
   ],
-  activeConversationId,
-  onSelectConversation
+  activeConversationId: _activeConversationId,
+  onSelectConversation: _onSelectConversation
 }: ConversationListProps) {
   return (
     <div style={{
