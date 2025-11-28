@@ -1,5 +1,5 @@
-// src/components/features/chat/ChatSidebar.tsx
-import { useState } from 'react';
+// src/components/features/chat/ChatSidebar.tsx - MOBILE RESPONSIVE VERSION (NO TOP BUTTON)
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDisconnect } from 'wagmi';
 import UserProfile from '../../shared/chat/UserProfile';
@@ -11,6 +11,7 @@ import type { MentorMode } from '../../../types/chat.types';
 interface ChatSidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  onToggle?: () => void;
   currentMode?: MentorMode;
   onModeChange?: (mode: MentorMode) => void;
   onNewChat?: () => void;
@@ -25,8 +26,18 @@ export default function ChatSidebar({
 }: ChatSidebarProps) {
   const [activeConversationId, setActiveConversationId] = useState<string>();
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
   const { disconnect } = useDisconnect();
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleClearAll = () => {
     const confirmed = window.confirm('Clear all conversations? This cannot be undone.');
@@ -48,27 +59,37 @@ export default function ChatSidebar({
     // Add theme switching logic here if needed
   };
 
+  const handleSidebarClose = () => {
+    if (isMobile && onClose) {
+      onClose();
+    }
+  };
+
   return (
     <>
-      {isOpen && window.innerWidth < 768 && (
+      {/* Overlay (Mobile Only) */}
+      {isMobile && isOpen && (
         <div
-          onClick={onClose}
+          onClick={handleSidebarClose}
           style={{
             position: 'fixed',
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 998
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 998,
+            transition: 'opacity 0.3s ease'
           }}
         />
       )}
 
+      {/* Sidebar */}
       <div
         style={{
           position: 'fixed',
-          left: 0,
+          left: isOpen ? 0 : '-280px',
           top: 0,
           bottom: 0,
           width: '280px',
@@ -77,24 +98,42 @@ export default function ChatSidebar({
           borderRight: '1px solid rgba(255, 255, 255, 0.1)',
           display: 'flex',
           flexDirection: 'column',
-          transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
-          transition: 'transform 0.3s ease',
-          zIndex: 999
+          transition: 'left 0.3s ease',
+          zIndex: 999,
+          boxShadow: isOpen ? '4px 0 24px rgba(0, 0, 0, 0.3)' : 'none'
         }}
       >
-        <div style={{ padding: '0 12px', paddingTop: '12px', flexShrink: 0 }}>
-          <NewChatButton onClick={onNewChat} />
+        {/* New Chat Button */}
+        <div style={{ 
+          padding: '0 12px', 
+          paddingTop: '12px',
+          flexShrink: 0 
+        }}>
+          <NewChatButton onClick={() => {
+            onNewChat?.();
+            if (isMobile) handleSidebarClose();
+          }} />
         </div>
+
+        {/* Conversation List */}
         <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
           <ConversationList
             activeConversationId={activeConversationId}
-            onSelectConversation={setActiveConversationId}
+            onSelectConversation={(id) => {
+              setActiveConversationId(id);
+              if (isMobile) handleSidebarClose();
+            }}
           />
         </div>
+
+        {/* Actions & Profile */}
         <div style={{ flexShrink: 0 }}>
           <SidebarActions
             currentMode={currentMode}
-            onChangeMode={onModeChange}
+            onChangeMode={(mode) => {
+              onModeChange?.(mode);
+              if (isMobile) handleSidebarClose();
+            }}
           />
           <UserProfile
             onClearAll={handleClearAll}

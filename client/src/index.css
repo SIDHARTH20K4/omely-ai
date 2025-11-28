@@ -32,6 +32,8 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+
+  --header-height: 80px;
   
   /* Breakpoints (for JS/TS use) */
   --breakpoint-sm: 640px;

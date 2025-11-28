@@ -1,4 +1,4 @@
-// src/components/features/chat/ChatInterface.tsx
+// src/components/features/chat/ChatInterface.tsx - MOBILE RESPONSIVE VERSION
 import React, { useState, useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi';
 import { sendMessage } from '../../../api/openai';
@@ -8,16 +8,27 @@ import type { MentorMode, ChatMessage } from '../../../types/chat.types';
 interface ChatInterfaceProps {
   mode: MentorMode;
   initialMessage?: string;
+  sidebarOpen?: boolean;
 }
 
-export default function ChatInterface({ mode, initialMessage }: ChatInterfaceProps) {
+export default function ChatInterface({ mode, initialMessage, sidebarOpen = true }: ChatInterfaceProps) {
   const { address } = useAccount();
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (initialMessage && messages.length === 0) {
@@ -81,9 +92,10 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
       flexDirection: 'column',
       height: '100vh',
       padding: '0',
-      paddingLeft: '280px',
+      paddingLeft: isMobile ? '0' : (sidebarOpen ? '280px' : '0'),
       position: 'relative',
-      zIndex: 1
+      zIndex: 1,
+      transition: 'padding-left 0.3s ease'
     }}>
       {/* Chat Messages - ChatGPT Style */}
       <div 
@@ -91,7 +103,7 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
         style={{
           flex: 1,
           overflowY: 'auto',
-          padding: '16px 20px',
+          padding: isMobile ? '12px' : '16px 20px',
           display: 'flex',
           flexDirection: 'column',
           gap: '0px'
@@ -100,11 +112,11 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
         {messages.length === 0 && !loading && (
           <div style={{
             textAlign: 'center',
-            padding: '60px 20px',
+            padding: isMobile ? '40px 16px' : '60px 20px',
             color: 'rgba(255, 255, 255, 0.5)',
             margin: 'auto'
           }}>
-            <p style={{ fontSize: '18px' }}>
+            <p style={{ fontSize: isMobile ? '16px' : '18px' }}>
               Start your conversation...
             </p>
           </div>
@@ -129,15 +141,15 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '12px',
-                maxWidth: '75%',
+                gap: isMobile ? '8px' : '12px',
+                maxWidth: isMobile ? '90%' : '75%',
                 flexDirection: isUserMessage ? 'row-reverse' : 'row'
               }}>
               {/* Avatar - only show if not grouped or first message */}
               {(!isGrouped || index === 0) && (
                 <div style={{
-                  width: '30px',
-                  height: '30px',
+                  width: isMobile ? '24px' : '30px',
+                  height: isMobile ? '24px' : '30px',
                   borderRadius: '50%',
                   flexShrink: 0,
                   display: 'flex',
@@ -150,21 +162,21 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
                   marginTop: '2px'
                 }}>
                   {isUserMessage ? (
-                    <span style={{ fontSize: '16px' }}>👤</span>
+                    <span style={{ fontSize: isMobile ? '14px' : '16px' }}>👤</span>
                   ) : (
-                    <span style={{ fontSize: '18px' }}>{getModeIcon()}</span>
+                    <span style={{ fontSize: isMobile ? '16px' : '18px' }}>{getModeIcon()}</span>
                   )}
                 </div>
               )}
               
               {/* Spacer for grouped messages */}
               {isGrouped && index > 0 && (
-                <div style={{ width: '30px', flexShrink: 0 }} />
+                <div style={{ width: isMobile ? '24px' : '30px', flexShrink: 0 }} />
               )}
               
               {/* Message Bubble */}
               <div style={{
-                padding: '12px 16px',
+                padding: isMobile ? '10px 12px' : '12px 16px',
                 borderRadius: isUserMessage 
                   ? '18px 18px 4px 18px' 
                   : '18px 18px 18px 4px',
@@ -178,7 +190,7 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
                 color: 'white',
                 whiteSpace: 'pre-wrap',
                 lineHeight: '1.6',
-                fontSize: '15px',
+                fontSize: isMobile ? '14px' : '15px',
                 wordWrap: 'break-word'
               }}>
                 {msg.content}
@@ -201,13 +213,13 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
             <div style={{
               display: 'flex',
               alignItems: 'flex-start',
-              gap: '12px',
-              maxWidth: '75%'
+              gap: isMobile ? '8px' : '12px',
+              maxWidth: isMobile ? '90%' : '75%'
             }}>
               {/* Avatar */}
               <div style={{
-                width: '30px',
-                height: '30px',
+                width: isMobile ? '24px' : '30px',
+                height: isMobile ? '24px' : '30px',
                 borderRadius: '50%',
                 flexShrink: 0,
                 display: 'flex',
@@ -217,18 +229,18 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
                 backgroundColor: 'rgba(102, 126, 234, 0.3)',
                 marginTop: '2px'
               }}>
-                <span style={{ fontSize: '18px' }}>{getModeIcon()}</span>
+                <span style={{ fontSize: isMobile ? '16px' : '18px' }}>{getModeIcon()}</span>
               </div>
               
               {/* Loading Bubble */}
               <div style={{
-                padding: '12px 16px',
+                padding: isMobile ? '10px 12px' : '12px 16px',
                 borderRadius: '18px 18px 18px 4px',
                 backgroundColor: 'rgba(255, 255, 255, 0.15)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 color: 'rgba(255, 255, 255, 0.7)',
-                fontSize: '15px',
+                fontSize: isMobile ? '14px' : '15px',
                 lineHeight: '1.6'
               }}>
                 Thinking...
@@ -240,7 +252,7 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
 
       {/* Input Form - WhatsApp Style */}
       <form onSubmit={handleSubmit} style={{
-        padding: '12px 20px',
+        padding: isMobile ? '10px 12px' : '12px 20px',
         backgroundColor: 'rgba(0, 0, 0, 0.2)',
         backdropFilter: 'blur(10px)',
         borderTop: '1px solid rgba(255, 255, 255, 0.1)'
@@ -259,11 +271,11 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
             disabled={loading}
             style={{
               width: '100%',
-              minHeight: '44px',
-              maxHeight: '120px',
-              padding: '10px 60px 10px 16px',
-              fontSize: '15px',
-              borderRadius: '24px',
+              minHeight: isMobile ? '40px' : '44px',
+              maxHeight: isMobile ? '100px' : '120px',
+              padding: isMobile ? '8px 52px 8px 12px' : '10px 60px 10px 16px',
+              fontSize: isMobile ? '14px' : '15px',
+              borderRadius: isMobile ? '20px' : '24px',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               backgroundColor: 'rgba(255, 255, 255, 0.1)',
               color: 'white',
@@ -284,9 +296,9 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
             disabled={loading || !input.trim()}
             style={{
               position: 'absolute',
-              right: '8px',
-              width: '36px',
-              height: '36px',
+              right: isMobile ? '6px' : '8px',
+              width: isMobile ? '32px' : '36px',
+              height: isMobile ? '32px' : '36px',
               borderRadius: '50%',
               border: 'none',
               background: loading || !input.trim()
@@ -298,7 +310,7 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '16px',
+              fontSize: isMobile ? '14px' : '16px',
               flexShrink: 0
             }}
           >
@@ -309,12 +321,12 @@ export default function ChatInterface({ mode, initialMessage }: ChatInterfacePro
         {error && (
           <div style={{
             marginTop: '8px',
-            padding: '10px 16px',
+            padding: isMobile ? '8px 12px' : '10px 16px',
             backgroundColor: 'rgba(239, 68, 68, 0.2)',
             border: '1px solid rgba(239, 68, 68, 0.4)',
             borderRadius: '8px',
             color: '#ef4444',
-            fontSize: '13px',
+            fontSize: isMobile ? '12px' : '13px',
             maxWidth: '1400px',
             marginLeft: 'auto',
             marginRight: 'auto'

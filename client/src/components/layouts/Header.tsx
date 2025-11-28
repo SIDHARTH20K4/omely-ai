@@ -1,5 +1,5 @@
-// src/components/layouts/Header.tsx
-import React from 'react';
+// src/components/layouts/Header.tsx - CREATIVE UNIFIED MENU
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css'; 
 import logoImage from "../../assets/logo.png";
@@ -18,43 +18,96 @@ const Header: React.FC<HeaderProps> = ({
   ],
   actionButton
 }) => {
-  // Use provided logoPath or fall back to imported image
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const logo = logoPath || logoImage;
 
   return (
-    <header className="header">
-      <div className="header-left">
-        <div className="logo">
-          <img src={logo} alt="Logo" className="logo-image" />
-        </div>
-      </div>
-
-      <div className="header-right">
-        <nav className="nav-links">
-          {navLinks.map((link, index) => {
-            // Check if it's an external link (starts with http)
-            const isExternal = link.href.startsWith('http');
-            
-            if (isExternal) {
-              return (
-                <a key={index} href={link.href} className="nav-link" target="_blank" rel="noopener noreferrer">
-                  {link.label}
-                </a>
-              );
-            }
-            
-            return (
-              <Link key={index} to={link.href} className="nav-link">
-                {link.label}
-              </Link>
-            );
-          })}
-          <div className="action-button-container">
-            {actionButton}
+    <>
+      <header className="header">
+        <div className="header-content">
+          {/* Left Side - Logo */}
+          <div className="header-left">
+            <Link to="/" className="logo" onClick={() => setIsMenuOpen(false)}>
+              <img src={logo} alt="Logo" className="logo-image" />
+            </Link>
           </div>
-        </nav>
-      </div>
-    </header>
+
+          {/* Right Side - Unified Menu Button */}
+          <div className="header-right">
+            <button 
+              className="unified-menu-button"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <span className="menu-icon-wrapper">
+                <span className={`hamburger-icon ${isMenuOpen ? 'open' : ''}`}>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </span>
+              </span>
+              <span className="menu-label">Menu</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Dropdown Panel - Contains Navigation + Wallet */}
+        <div className={`unified-dropdown ${isMenuOpen ? 'active' : ''}`}>
+          <div className="dropdown-content">
+            {/* Navigation Links */}
+            <nav className="dropdown-nav">
+              <div className="nav-section-title">Navigation</div>
+              {navLinks.map((link, index) => {
+                const isExternal = link.href.startsWith('http');
+                
+                if (isExternal) {
+                  return (
+                    <a 
+                      key={index} 
+                      href={link.href} 
+                      className="dropdown-link"
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <span className="link-icon">→</span>
+                      <span className="link-text">{link.label}</span>
+                    </a>
+                  );
+                }
+                
+                return (
+                  <Link 
+                    key={index} 
+                    to={link.href} 
+                    className="dropdown-link"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <span className="link-icon">→</span>
+                    <span className="link-text">{link.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Wallet Section */}
+            <div className="wallet-section">
+              <div className="wallet-divider"></div>
+              <div className="wallet-wrapper">
+                {actionButton}
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Overlay - Outside header to cover entire page */}
+      {isMenuOpen && (
+        <div 
+          className="menu-overlay"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+    </>
   );
 };
 

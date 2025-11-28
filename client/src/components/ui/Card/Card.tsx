@@ -1,5 +1,6 @@
 import React from 'react';
 import type { CardProps } from '../../../index';
+import './Card.css';
 
 const Card: React.FC<CardProps> = ({
   title,
@@ -15,20 +16,9 @@ const Card: React.FC<CardProps> = ({
   onMouseLeave,
 }) => {
   const cardStyle: React.CSSProperties = {
-    flex: width ? undefined : 1,
-    textAlign: 'justify', 
-    lineHeight: 1.6,
-    background: 'var(--color-bg)',
-    backdropFilter: 'blur(10px)',
-    border: '1px solid var(--color-border)',
-    borderRadius: '16px',
-    padding: '2.5rem',
-    transition: 'all 0.3s ease',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    minHeight: height ? (typeof height === 'number' ? `${height}px` : height) : '450px',
-    width: width ? (typeof width === 'number' ? `${width}px` : width) : undefined,
+    flex: width ? undefined : '1 1 280px',
+    minHeight: height ? (typeof height === 'number' ? `${height}px` : height) : undefined,
+    width: width ? (typeof width === 'number' ? `${width}px` : width) : '100%',
     ...style,
   };
 
@@ -38,41 +28,30 @@ const Card: React.FC<CardProps> = ({
     objectFit: 'contain',
   };
 
+  const combinedClassName = ['omely-card', className].filter(Boolean).join(' ');
+
   return (
     <div
-      className={className}
+      className={combinedClassName}
       style={cardStyle}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
       {image && (
-        <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div className="omely-card__image">
           <img src={image} alt={title || 'Card image'} style={imageStyle} />
         </div>
       )}
       
       {(title || body) && (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div className="omely-card__body">
           {title && (
-            <h3 style={{
-              fontSize: '1.4rem',
-              fontWeight: 600,
-              marginBottom: '1rem',
-              color: '#f8fafc',
-              lineHeight: 1.3,
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
-            }}>
+            <h3 className="omely-card__title">
               {title}
             </h3>
           )}
           {body && (
-            <p style={{
-              color: '#e5e7eb',
-              lineHeight: 1.6,
-              fontSize: '1rem',
-              margin: 0,
-              textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
-            }}>
+            <p className="omely-card__text">
               {body}
             </p>
           )}

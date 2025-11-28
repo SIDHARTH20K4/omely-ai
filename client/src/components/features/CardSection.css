@@ -1,0 +1,25 @@
+.cards-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: clamp(24px, 6vw, 60px) 16px clamp(64px, 10vw, 100px);
+  box-sizing: border-box;
+}
+
+.cards-section__inner {
+  width: min(1200px, 100%);
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: clamp(16px, 4vw, 32px);
+  justify-items: center;
+}
+
+@media (max-width: 600px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -1,5 +1,5 @@
-// src/components/features/ChatBox.tsx
-import { useState } from 'react';
+// src/components/features/ChatBox.tsx - MOBILE RESPONSIVE VERSION
+import { useState, useEffect } from 'react';
 import { sendMessage, clearConversation } from '../../api/openai';
 import type { MentorMode, ChatMessage } from '../../types/chat.types';
 
@@ -9,6 +9,16 @@ export default function ChatBox() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+
+  // Handle window resize for responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,8 +120,8 @@ export default function ChatBox() {
   return (
     <div style={{
       maxWidth: '900px',
-      margin: '50px auto',
-      padding: '24px',
+      margin: isMobile ? '20px auto' : '50px auto',
+      padding: isMobile ? '16px' : '24px',
       backgroundColor: 'rgba(0, 0, 0, 0.4)',
       borderRadius: '16px',
       border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -121,103 +131,144 @@ export default function ChatBox() {
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: isMobile ? 'flex-start' : 'center',
         marginBottom: '24px',
-        flexWrap: 'wrap',
+        flexDirection: isMobile ? 'column' : 'row',
         gap: '16px'
       }}>
         <h2 style={{
           color: 'white',
           margin: 0,
-          fontSize: '24px',
+          fontSize: isMobile ? '20px' : '24px',
           fontWeight: '600'
         }}>
           🤖 Chat with Omely
         </h2>
 
-        {/* Mode Selector */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => handleModeSwitch('socratic')}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: mode === 'socratic' ? '#10b981' : 'rgba(255, 255, 255, 0.1)',
-              color: mode === 'socratic' ? 'white' : '#9ca3af',
-              border: mode === 'socratic' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: mode === 'socratic' ? '600' : '400',
-              transition: 'all 0.2s ease',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            🎯 Adaptive
-          </button>
-          
-          <button
-            onClick={() => handleModeSwitch('feynman')}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: mode === 'feynman' ? '#10b981' : 'rgba(255, 255, 255, 0.1)',
-              color: mode === 'feynman' ? 'white' : '#9ca3af',
-              border: mode === 'feynman' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: mode === 'feynman' ? '600' : '400',
-              transition: 'all 0.2s ease',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            🧠 Feynman
-          </button>
+        {/* Mode Selector - Desktop: Buttons / Mobile: Dropdown */}
+        {isMobile ? (
+          <div style={{ width: '100%', display: 'flex', gap: '8px' }}>
+            <select
+              value={mode}
+              onChange={(e) => handleModeSwitch(e.target.value as MentorMode)}
+              style={{
+                flex: 1,
+                padding: '12px 16px',
+                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                color: 'white',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                outline: 'none'
+              }}
+            >
+              <option value="socratic" style={{ background: '#1a1a1a' }}>🎯 Adaptive</option>
+              <option value="feynman" style={{ background: '#1a1a1a' }}>🧠 Feynman</option>
+              <option value="challenge" style={{ background: '#1a1a1a' }}>😈 Devil Mode</option>
+            </select>
+            <button
+              onClick={handleClearChat}
+              style={{
+                padding: '12px 16px',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                color: '#ef4444',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Clear
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => handleModeSwitch('socratic')}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: mode === 'socratic' ? '#10b981' : 'rgba(255, 255, 255, 0.1)',
+                color: mode === 'socratic' ? 'white' : '#9ca3af',
+                border: mode === 'socratic' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: mode === 'socratic' ? '600' : '400',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              🎯 Adaptive
+            </button>
+            
+            <button
+              onClick={() => handleModeSwitch('feynman')}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: mode === 'feynman' ? '#10b981' : 'rgba(255, 255, 255, 0.1)',
+                color: mode === 'feynman' ? 'white' : '#9ca3af',
+                border: mode === 'feynman' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: mode === 'feynman' ? '600' : '400',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              🧠 Feynman
+            </button>
 
-          <button
-            onClick={() => handleModeSwitch('challenge')}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: mode === 'challenge' ? '#10b981' : 'rgba(255, 255, 255, 0.1)',
-              color: mode === 'challenge' ? 'white' : '#9ca3af',
-              border: mode === 'challenge' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: mode === 'challenge' ? '600' : '400',
-              transition: 'all 0.2s ease',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            😈 Devil Mode
-          </button>
+            <button
+              onClick={() => handleModeSwitch('challenge')}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: mode === 'challenge' ? '#10b981' : 'rgba(255, 255, 255, 0.1)',
+                color: mode === 'challenge' ? 'white' : '#9ca3af',
+                border: mode === 'challenge' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: mode === 'challenge' ? '600' : '400',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              😈 Devil Mode
+            </button>
 
-          <button
-            onClick={handleClearChat}
-            style={{
-              padding: '10px 16px',
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
-              color: '#ef4444',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            Clear
-          </button>
-        </div>
+            <button
+              onClick={handleClearChat}
+              style={{
+                padding: '10px 16px',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                color: '#ef4444',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Clear
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Mode Info Banner */}
       <div style={{
-        padding: '16px',
+        padding: isMobile ? '12px' : '16px',
         backgroundColor: 'rgba(16, 185, 129, 0.1)',
         border: '1px solid rgba(16, 185, 129, 0.3)',
         borderRadius: '12px',
@@ -229,15 +280,15 @@ export default function ChatBox() {
           gap: '8px',
           marginBottom: '8px'
         }}>
-          <span style={{ fontSize: '20px' }}>{modeInfo.icon}</span>
-          <strong style={{ color: '#10b981', fontSize: '15px' }}>
+          <span style={{ fontSize: isMobile ? '18px' : '20px' }}>{modeInfo.icon}</span>
+          <strong style={{ color: '#10b981', fontSize: isMobile ? '14px' : '15px' }}>
             {modeInfo.title}
           </strong>
         </div>
         <p style={{
           color: 'rgba(255, 255, 255, 0.8)',
           margin: 0,
-          fontSize: '14px',
+          fontSize: isMobile ? '13px' : '14px',
           lineHeight: '1.5'
         }}>
           {modeInfo.description}
@@ -246,10 +297,10 @@ export default function ChatBox() {
 
       {/* Chat Messages */}
       <div style={{
-        height: '450px',
+        height: isMobile ? '350px' : '450px',
         overflowY: 'auto',
         marginBottom: '20px',
-        padding: '16px',
+        padding: isMobile ? '12px' : '16px',
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
         borderRadius: '12px',
         border: '1px solid rgba(255, 255, 255, 0.1)'
@@ -257,22 +308,22 @@ export default function ChatBox() {
         {messages.length === 0 && !loading && (
           <div style={{
             textAlign: 'center',
-            padding: '60px 20px',
+            padding: isMobile ? '40px 12px' : '60px 20px',
             color: 'rgba(255, 255, 255, 0.5)'
           }}>
-            <p style={{ fontSize: '18px', marginBottom: '20px' }}>
+            <p style={{ fontSize: isMobile ? '16px' : '18px', marginBottom: '20px' }}>
               {modeInfo.icon} Start a conversation
             </p>
             <div style={{
               backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              padding: '16px',
+              padding: isMobile ? '12px' : '16px',
               borderRadius: '8px',
               textAlign: 'left',
               maxWidth: '500px',
               margin: '0 auto'
             }}>
               <p style={{
-                fontSize: '13px',
+                fontSize: isMobile ? '12px' : '13px',
                 color: 'rgba(255, 255, 255, 0.6)',
                 marginBottom: '8px'
               }}>
@@ -281,14 +332,14 @@ export default function ChatBox() {
               <div style={{ marginBottom: '12px' }}>
                 <span style={{
                   color: '#60a5fa',
-                  fontSize: '12px',
+                  fontSize: isMobile ? '11px' : '12px',
                   fontWeight: '600'
                 }}>
                   You:
                 </span>
                 <p style={{
                   color: 'rgba(255, 255, 255, 0.9)',
-                  fontSize: '14px',
+                  fontSize: isMobile ? '13px' : '14px',
                   margin: '4px 0'
                 }}>
                   {modeInfo.exampleUser}
@@ -297,14 +348,14 @@ export default function ChatBox() {
               <div>
                 <span style={{
                   color: '#10b981',
-                  fontSize: '12px',
+                  fontSize: isMobile ? '11px' : '12px',
                   fontWeight: '600'
                 }}>
                   Omely:
                 </span>
                 <p style={{
                   color: 'rgba(255, 255, 255, 0.9)',
-                  fontSize: '14px',
+                  fontSize: isMobile ? '13px' : '14px',
                   margin: '4px 0'
                 }}>
                   {modeInfo.exampleAI}
@@ -319,7 +370,7 @@ export default function ChatBox() {
             key={index}
             style={{
               marginBottom: '16px',
-              padding: '14px',
+              padding: isMobile ? '12px' : '14px',
               borderRadius: '12px',
               backgroundColor: msg.role === 'user'
                 ? 'rgba(59, 130, 246, 0.15)'
@@ -335,12 +386,12 @@ export default function ChatBox() {
               gap: '8px',
               marginBottom: '8px'
             }}>
-              <span style={{ fontSize: '18px' }}>
+              <span style={{ fontSize: isMobile ? '16px' : '18px' }}>
                 {msg.role === 'user' ? '👤' : modeInfo.icon}
               </span>
               <strong style={{
                 color: msg.role === 'user' ? '#60a5fa' : '#10b981',
-                fontSize: '14px'
+                fontSize: isMobile ? '13px' : '14px'
               }}>
                 {msg.role === 'user' ? 'You' : 'Omely'}
               </strong>
@@ -350,7 +401,7 @@ export default function ChatBox() {
               margin: 0,
               whiteSpace: 'pre-wrap',
               lineHeight: '1.6',
-              fontSize: '14px'
+              fontSize: isMobile ? '13px' : '14px'
             }}>
               {msg.content}
             </p>
@@ -359,7 +410,7 @@ export default function ChatBox() {
 
         {loading && (
           <div style={{
-            padding: '14px',
+            padding: isMobile ? '12px' : '14px',
             borderRadius: '12px',
             backgroundColor: 'rgba(16, 185, 129, 0.15)',
             border: '1px solid rgba(16, 185, 129, 0.3)'
@@ -369,15 +420,15 @@ export default function ChatBox() {
               alignItems: 'center',
               gap: '8px'
             }}>
-              <span style={{ fontSize: '18px' }}>{modeInfo.icon}</span>
-              <strong style={{ color: '#10b981', fontSize: '14px' }}>
+              <span style={{ fontSize: isMobile ? '16px' : '18px' }}>{modeInfo.icon}</span>
+              <strong style={{ color: '#10b981', fontSize: isMobile ? '13px' : '14px' }}>
                 Omely
               </strong>
             </div>
             <p style={{
               color: 'rgba(255, 255, 255, 0.6)',
               margin: '8px 0 0 0',
-              fontSize: '14px'
+              fontSize: isMobile ? '13px' : '14px'
             }}>
               {mode === 'socratic' 
                 ? 'Thinking of a question...' 
@@ -399,9 +450,9 @@ export default function ChatBox() {
           disabled={loading}
           style={{
             width: '100%',
-            minHeight: '100px',
-            padding: '14px',
-            fontSize: '14px',
+            minHeight: isMobile ? '80px' : '100px',
+            padding: isMobile ? '12px' : '14px',
+            fontSize: isMobile ? '13px' : '14px',
             borderRadius: '12px',
             border: '1px solid rgba(255, 255, 255, 0.2)',
             backgroundColor: 'rgba(255, 255, 255, 0.05)',
@@ -423,10 +474,12 @@ export default function ChatBox() {
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '12px' : '0'
         }}>
           <p style={{
-            fontSize: '12px',
+            fontSize: isMobile ? '11px' : '12px',
             color: 'rgba(255, 255, 255, 0.5)',
             margin: 0
           }}>
@@ -437,15 +490,16 @@ export default function ChatBox() {
             type="submit"
             disabled={loading || !input.trim()}
             style={{
-              padding: '12px 32px',
-              fontSize: '15px',
+              padding: isMobile ? '12px 24px' : '12px 32px',
+              fontSize: isMobile ? '14px' : '15px',
               fontWeight: '600',
               borderRadius: '10px',
               border: 'none',
               backgroundColor: loading || !input.trim() ? 'rgba(255, 255, 255, 0.1)' : '#10b981',
               color: loading || !input.trim() ? 'rgba(255, 255, 255, 0.3)' : 'white',
               cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              width: isMobile ? '100%' : 'auto'
             }}
           >
             {loading ? '⏳ Sending...' : '✨ Send'}
@@ -457,12 +511,12 @@ export default function ChatBox() {
       {error && (
         <div style={{
           marginTop: '16px',
-          padding: '14px',
+          padding: isMobile ? '12px' : '14px',
           backgroundColor: 'rgba(239, 68, 68, 0.1)',
           border: '1px solid rgba(239, 68, 68, 0.3)',
           borderRadius: '10px',
           color: '#ef4444',
-          fontSize: '14px',
+          fontSize: isMobile ? '13px' : '14px',
           display: 'flex',
           alignItems: 'center',
           gap: '8px'

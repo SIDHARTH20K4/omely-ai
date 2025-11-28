@@ -13,7 +13,8 @@ export default function VisionPage() {
         width: '100%',
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        paddingTop: 'var(--header-height, 80px)'
       }}>
         <Header 
           navLinks={[

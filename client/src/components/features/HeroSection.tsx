@@ -1,66 +1,15 @@
+import './HeroSection.css';
+
 export default function HeroSection() {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      textAlign: 'center',
-      color: 'white',
-      padding: '80px 0 20px',
-      position: 'relative',
-      zIndex: 1,
-      whiteSpace: 'nowrap'
-    }}>
-      <div style={{ maxWidth: '600px' }}>
-        {/* Main Heading */}
-        <h1 style={{
-          fontSize: '3.5rem',
-          fontWeight: '700',
-          marginBottom: '1rem',
-          lineHeight: '1.1',
-          color: 'white',
-          whiteSpace: 'nowrap' 
-        }}>
-          Your Brain Isn't Broken.
-        </h1>
-        
-        {/* Subtitle */}
-        <p style={{
-          fontSize: '1.8rem',
-          fontWeight: '400',
-          marginBottom: '2rem',
-          color: '#e5e7eb',
-          lineHeight: '1.4',
-          whiteSpace: 'nowrap' 
-        }}>
-          Your Learning Method Is.
-        </p>
-        
-        {/* Feature Text */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.5rem',
-          marginBottom: '0',
-          color: '#d1d5db',
-          fontSize: '1.2rem',
-          whiteSpace: 'nowrap' 
-        }}>
-          <span style={{ 
-            color: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.08)',
-            border: '1px solid rgba(16, 185, 129, 0.4)',
-            padding: '0.75rem 1.5rem',
-            borderRadius: '25px',
-            fontWeight: '500',
-            backdropFilter: 'blur(10px)',
-            display: 'inline-block'
-          }}>
-            Built on cognitive science
-          </span>
+    <section className="hero">
+      <div className="hero__content">
+        <h1 className="hero__heading">Your Brain Isn&apos;t Broken.</h1>
+        <p className="hero__subheading">Your Learning Method Is.</p>
+        <div className="hero__badge-row">
+          <span className="hero__badge">Built on cognitive science</span>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
