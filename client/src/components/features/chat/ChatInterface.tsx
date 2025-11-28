@@ -30,13 +30,14 @@ export default function ChatInterface({ mode, initialMessage, sidebarOpen = true
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Auto-send initial message
   useEffect(() => {
     if (initialMessage && messages.length === 0) {
       handleSendMessage(initialMessage);
     }
   }, [initialMessage]);
 
-  // Auto-scroll to bottom when messages or loading state changes
+  // Auto-scroll to bottom
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -46,27 +47,43 @@ export default function ChatInterface({ mode, initialMessage, sidebarOpen = true
   const handleSendMessage = async (messageText: string) => {
     if (!messageText.trim()) return;
 
+    // Reset error
     setError('');
     setLoading(true);
 
+    // Push user message
     const userMessage: ChatMessage = { role: 'user', content: messageText };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
 
-    // Track message
+    // Analytics
     if (address) {
       Analytics.trackMessage(address, mode);
     }
 
     try {
-      const result = await sendMessage(messageText, mode);
+      // 🔥 Pass wallet address into API
+      const result = await sendMessage(messageText, mode, address ?? '');
+
       const aiMessage: ChatMessage = { role: 'assistant', content: result };
       setMessages(prev => [...prev, aiMessage]);
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
-      setError(errorMessage);
+
+      // 🔥 handle rate limit cleanly
+      if (errorMessage.includes('Daily message limit')) {
+        setError('🚫 Daily limit reached (50). Come back tomorrow.');
+      } else {
+        setError(errorMessage);
+      }
+
+      // Remove last user message
       setMessages(prev => prev.slice(0, -1));
+
+      // Put message back into textbox
       setInput(messageText);
+
     } finally {
       setLoading(false);
     }
@@ -97,7 +114,7 @@ export default function ChatInterface({ mode, initialMessage, sidebarOpen = true
       zIndex: 1,
       transition: 'padding-left 0.3s ease'
     }}>
-      {/* Chat Messages - ChatGPT Style */}
+      {/* Chat Messages */}
       <div 
         ref={messagesContainerRef}
         style={{
@@ -145,8 +162,7 @@ export default function ChatInterface({ mode, initialMessage, sidebarOpen = true
                 maxWidth: isMobile ? '90%' : '75%',
                 flexDirection: isUserMessage ? 'row-reverse' : 'row'
               }}>
-              {/* Avatar - only show if not grouped or first message */}
-              {(!isGrouped || index === 0) && (
+              {!isGrouped && (
                 <div style={{
                   width: isMobile ? '24px' : '30px',
                   height: isMobile ? '24px' : '30px',
@@ -168,13 +184,8 @@ export default function ChatInterface({ mode, initialMessage, sidebarOpen = true
                   )}
                 </div>
               )}
-              
-              {/* Spacer for grouped messages */}
-              {isGrouped && index > 0 && (
-                <div style={{ width: isMobile ? '24px' : '30px', flexShrink: 0 }} />
-              )}
-              
-              {/* Message Bubble */}
+
+              {/* Bubble */}
               <div style={{
                 padding: isMobile ? '10px 12px' : '12px 16px',
                 borderRadius: isUserMessage 
@@ -200,7 +211,6 @@ export default function ChatInterface({ mode, initialMessage, sidebarOpen = true
           );
         })}
         
-        {/* Invisible element at the bottom for scrolling */}
         <div ref={messagesEndRef} />
 
         {loading && (
@@ -216,7 +226,6 @@ export default function ChatInterface({ mode, initialMessage, sidebarOpen = true
               gap: isMobile ? '8px' : '12px',
               maxWidth: isMobile ? '90%' : '75%'
             }}>
-              {/* Avatar */}
               <div style={{
                 width: isMobile ? '24px' : '30px',
                 height: isMobile ? '24px' : '30px',
@@ -231,8 +240,7 @@ export default function ChatInterface({ mode, initialMessage, sidebarOpen = true
               }}>
                 <span style={{ fontSize: isMobile ? '16px' : '18px' }}>{getModeIcon()}</span>
               </div>
-              
-              {/* Loading Bubble */}
+
               <div style={{
                 padding: isMobile ? '10px 12px' : '12px 16px',
                 borderRadius: '18px 18px 18px 4px',
@@ -250,7 +258,7 @@ export default function ChatInterface({ mode, initialMessage, sidebarOpen = true
         )}
       </div>
 
-      {/* Input Form - WhatsApp Style */}
+      {/* Input */}
       <form onSubmit={handleSubmit} style={{
         padding: isMobile ? '10px 12px' : '12px 20px',
         backgroundColor: 'rgba(0, 0, 0, 0.2)',

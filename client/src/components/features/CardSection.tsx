@@ -24,6 +24,7 @@ const CardSection: React.FC = () => {
               body={card.description}
               imageWidth="120px"
               imageHeight="120px"
+              className={index === 2 ? "fix-small-image" : ""}
               style={getCardStyle(index)}
               onMouseEnter={() => setHoveredCard(index)}
               onMouseLeave={() => setHoveredCard(null)}
