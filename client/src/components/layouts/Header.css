@@ -1,0 +1,121 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.6); 
+  backdrop-filter: blur(8px);          
+  padding: 0rem 2rem;
+  border-bottom: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 80px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.logo-image {
+  height: 180px;
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+.logo-image:hover {
+  transform: scale(1.05);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: #93c5fd;
+  text-shadow: 0 0 10px rgba(147, 197, 253, 0.5);
+}
+
+.action-button-container {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+}
+
+.action-button-container > div {
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Style for connected/disconnected state */
+.login-button {
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  backdrop-filter: blur(5px);
+  background: transparent;
+}
+
+.login-button:hover {
+  background: rgb(103, 95, 280);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 119, 255, 0.4);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+  }
+  
+  .nav-links {
+    gap: 1rem;
+  }
+  
+  .nav-link {
+    font-size: 0.9rem;
+  }
+  
+  .login-button {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .logo-image {
+    height: 50px;
+  }
+
+  .action-button-container button {
+    padding: 0.4rem 1rem !important;
+    font-size: 0.9rem !important;
+  }
+}

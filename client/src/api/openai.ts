@@ -1,0 +1,162 @@
+// src/api/openai.ts
+import OpenAI from 'openai';
+import type { Message, MentorMode } from '../types/chat.types';
+
+export const openai = new OpenAI({
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
+
+// Add the third prompt here:
+export const PROMPTS: Record<MentorMode, string> = {
+  socratic: `You are Omely, an AI hyperpersonalized mentor designed to revolutionize global learning by detecting and breaking users' limiting beliefs.
+Always respond in English only.
+You are NOT an assistant that gives ready-made answers. You are a MENTOR who guides users toward real understanding.
+YOUR ROLE:
+* Ask Socratic questions to make them think
+* Detect misunderstandings and address them immediately
+* Challenge superficial explanations
+* Encourage active learning over passive consumption
+* Proactively detect EVERY limiting belief (e.g., "I'm bad at math", "I can't learn this") in user statements, behaviors, or hesitations; challenge them empathetically, reframe positively, and guide users to evidence-based breakthroughs for lasting mindset shifts
+* ALWAYS assess user's level BEFORE explaining a new topic`,
+
+  feynman: `You are Omely in Feynman Mode: an AI mentor using the Feynman Technique to deepen understanding.
+Always respond in English only.
+YOUR ROLE:
+* Instruct user to explain concepts in their own words as if teaching a child.
+* Respond as a curious 12-year-old kid: ask simple, naive questions to probe gaps (e.g., "Why does that happen? Can you explain it like I'm five?").
+* Detect misunderstandings and limiting beliefs; challenge them playfully.
+* Guide toward clarity without giving answers—encourage re-explanation.
+* Assess user's level through their explanations before advancing.`,
+
+  // ← ADD THIS:
+  challenge: `You are Omely in Challenge Mode: an AI mentor stress-testing users' learning for deeper mastery.
+Always respond in English only.
+YOUR ROLE:
+* Question everything the user says about their learning—play devil's advocate without being annoying.
+* Ask "but what about..." questions to probe assumptions.
+* Point out edge cases and counterexamples.
+* Make them defend their understanding with evidence.
+* Push them to think deeper by stress-testing their knowledge, strengthening understanding through constructive challenge.
+* Detect misunderstandings and limiting beliefs; address them empathetically.
+* Assess user's level through responses before advancing.`
+};
+
+// Update conversation storage to include challenge mode:
+const conversations: Record<MentorMode, Message[]> = {
+  socratic: [],
+  feynman: [],
+  challenge: [] 
+};
+
+function initializeConversation(mode: MentorMode): void {
+  if (conversations[mode].length === 0) {
+    conversations[mode].push({
+      role: 'system',
+      content: PROMPTS[mode]
+    });
+  }
+}
+
+function trimHistory(messages: Message[], keepLastExchanges: number = 5): Message[] {
+  const systemMessage = messages[0];
+  const conversationMessages = messages.slice(1);
+  const messagesToKeep = keepLastExchanges * 2;
+  const trimmedMessages = conversationMessages.slice(-messagesToKeep);
+  return [systemMessage, ...trimmedMessages];
+}
+
+// src/api/openai.ts
+export async function sendMessage(
+  message: string,
+  mode: MentorMode = 'socratic'
+): Promise<string> {
+  try {
+    if (!import.meta.env.VITE_OPENAI_API_KEY) {
+      throw new Error('OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY to your .env file.');
+    }
+
+    initializeConversation(mode);
+
+    conversations[mode].push({
+      role: 'user',
+      content: message
+    });
+
+    const trimmedHistory = trimHistory(conversations[mode], 5);
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: trimmedHistory,
+      temperature: 0.7,
+      max_tokens: 300,
+    });
+
+    // ✅ FIX: Check if response exists and has content
+    const choice = completion.choices[0];
+    
+    if (!choice) {
+      throw new Error('No response received from AI');
+    }
+
+    const aiResponse = choice.message?.content;
+
+    // ✅ FIX: Handle null content
+    if (!aiResponse || aiResponse.trim() === '') {
+      console.error('Empty AI response. Full completion:', JSON.stringify(completion, null, 2));
+      
+      // Check if there was a finish reason
+      if (choice.finish_reason === 'content_filter') {
+        throw new Error('Response was filtered for safety reasons. Please rephrase your message.');
+      } else if (choice.finish_reason === 'length') {
+        throw new Error('Response was too long. Try asking something more specific.');
+      }
+      
+      throw new Error('Received empty response from AI. Please try again.');
+    }
+
+    conversations[mode].push({
+      role: 'assistant',
+      content: aiResponse
+    });
+
+    return aiResponse;
+  } catch (error: any) {
+    console.error('OpenAI API Error:', error);
+
+    // Provide helpful error messages
+    if (error?.status === 401) {
+      throw new Error('Invalid API key. Please check your OpenAI API key.');
+    } else if (error?.status === 429) {
+      throw new Error('Rate limit exceeded. Please try again in a moment.');
+    } else if (error?.status === 500) {
+      throw new Error('OpenAI server error. Please try again later.');
+    } else if (error?.status === 400) {
+      throw new Error('Bad request. Please check your message and try again.');
+    }
+
+    // Re-throw if it's already our custom error
+    if (error instanceof Error && error.message.includes('Response was filtered')) {
+      throw error;
+    }
+
+    throw new Error('Failed to get response from AI. Please try again.');
+  }
+}
+
+export function clearConversation(mode: MentorMode): void {
+  conversations[mode] = [{
+    role: 'system',
+    content: PROMPTS[mode]
+  }];
+}
+
+export function getConversationHistory(mode: MentorMode): Message[] {
+  return conversations[mode];
+}
+
+export function estimateTokenCount(mode: MentorMode): number {
+  const history = conversations[mode];
+  const totalChars = history.reduce((sum, msg) => sum + msg.content.length, 0);
+  return Math.ceil(totalChars / 4);
+}
