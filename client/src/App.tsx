@@ -3,8 +3,6 @@ import { useAccount } from 'wagmi';
 import { useEffect } from 'react';
 import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
-import VisionPage from './pages/VisionPage';
-import LightpaperPage from './pages/LightpaperPage';
 import Analytics from './Services/Analytics';
 import './App.css';
 
@@ -50,8 +48,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/vision" element={<VisionPage />} />
-        <Route path="/lightpaper" element={<LightpaperPage />} />
+        <Route path="https://omely.gitbook.io/docs"/>
+        <Route path="https://omely.gitbook.io/docs/lightpaper"/>
         <Route 
           path="/chat" 
           element={

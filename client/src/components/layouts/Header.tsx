@@ -13,8 +13,8 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ 
   logoPath,
   navLinks = [
-    { label: 'Our Vision', href: '/vision' },
-    { label: 'Lightpaper', href: '/lightpaper' },
+    { label: 'Our Vision', href: 'https://omely.gitbook.io/docs' },
+    { label: 'Lightpaper', href: 'https://omely.gitbook.io/docs/lightpaper' },
   ],
   actionButton
 }) => {
