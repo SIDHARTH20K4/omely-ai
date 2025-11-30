@@ -4,7 +4,7 @@
   justify-content: center;
   text-align: center;
   color: #ffffff;
-  padding: clamp(120px, 18vw, 200px) 20px 40px;
+  padding: clamp(80px, 12vw, 120px) 20px 40px;
   position: relative;
   z-index: 1;
   width: 100%;
@@ -54,11 +54,11 @@
 
 @media (max-width: 600px) {
   .hero {
-    padding: 140px 16px 32px;
+    padding: 100px 16px 32px; /* 🔥 Reduced mobile top padding from 140px to 100px */
   }
 
   .hero__badge {
     width: 100%;
   }
-}
 
+}

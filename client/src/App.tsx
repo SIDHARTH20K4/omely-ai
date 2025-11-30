@@ -25,6 +25,9 @@ function App() {
   // Session tracking
   useEffect(() => {
     if (isConnected && address) {
+      // Track wallet connection
+      Analytics.trackWalletConnect(address);
+      
       // Start session
       Analytics.startSession(address);
 

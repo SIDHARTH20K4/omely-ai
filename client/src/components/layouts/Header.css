@@ -25,6 +25,7 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  margin-right: auto; /* 🔥 Push logo to the left */
 }
 
 .logo {
@@ -32,6 +33,7 @@
   align-items: center;
   text-decoration: none;
   transition: transform 0.2s ease;
+  margin-left: -3rem; /* 🔥 PUSHED MORE to the left on desktop */
 }
 
 .logo:hover {
@@ -43,8 +45,6 @@
   width: 140px !important;
   object-fit: contain !important;
 }
-
-
 
 .logo:hover .logo-image {
   filter: brightness(1.1);
@@ -263,6 +263,10 @@
     padding: 1rem 1.5rem;
   }
 
+  .logo {
+    margin-left: -1.5rem; /* 🔥 Slight push on tablet */
+  }
+
   .logo-image {
     height: 54px; /* Slightly bigger on tablet */
   }
@@ -305,6 +309,7 @@
 
   .header-left .logo {
     padding: 0;
+    margin-left: 0; /* 🔥 Reset margin on mobile */
   }
 
   .header-left .logo .logo-image {

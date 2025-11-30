@@ -7,7 +7,7 @@ export const openai = new OpenAI({
   dangerouslyAllowBrowser: true,
 });
 
-const MAX_REQUESTS_PER_DAY = 5;
+const MAX_REQUESTS_PER_DAY = 50;
 
 function canUserSend(wallet: string): boolean {
   if (!wallet) return false;
