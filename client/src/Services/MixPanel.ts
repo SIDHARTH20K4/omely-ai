@@ -1,12 +1,12 @@
 import mixpanel from "mixpanel-browser";
 
-const token = 'ce527da814efa8b390277b58170dd2f3';
+const token = import.meta.env.VITE_MIXPANEL_TOKEN;
 
 if (token) {
   mixpanel.init(token, {
-    debug: true,
-    autocapture: true,
-    record_sessions_percent: 100,
+    debug: import.meta.env.DEV, // Only debug in development
+    track_pageview: true,
+    persistence: 'localStorage',
     api_host: 'https://api-eu.mixpanel.com',
   });
   console.log('✅ Mixpanel initialized!');

@@ -1,4 +1,4 @@
-// src/components/layouts/Header.tsx - CREATIVE UNIFIED MENU
+// src/components/layouts/Header.tsx - HYBRID DESKTOP/MOBILE HEADER
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css'; 
@@ -32,30 +32,64 @@ const Header: React.FC<HeaderProps> = ({
             </Link>
           </div>
 
-          {/* Right Side - Unified Menu Button */}
+          {/* Desktop Navigation - Hidden on Mobile */}
+          <nav className="desktop-nav">
+            {navLinks.map((link, index) => {
+              const isExternal = link.href.startsWith('http');
+              
+              if (isExternal) {
+                return (
+                  <a 
+                    key={index} 
+                    href={link.href} 
+                    className="desktop-nav-link"
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    {link.label}
+                  </a>
+                );
+              }
+              
+              return (
+                <Link 
+                  key={index} 
+                  to={link.href} 
+                  className="desktop-nav-link"
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Right Side */}
           <div className="header-right">
+            {/* Desktop Wallet Button - Hidden on Mobile */}
+            <div className="desktop-wallet">
+              {actionButton}
+            </div>
+
+            {/* Mobile Menu Button - Hidden on Desktop */}
             <button 
-              className="unified-menu-button"
+              className="mobile-menu-button"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
             >
-              <span className="menu-icon-wrapper">
-                <span className={`hamburger-icon ${isMenuOpen ? 'open' : ''}`}>
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </span>
+              <span className={`hamburger-icon ${isMenuOpen ? 'open' : ''}`}>
+                <span></span>
+                <span></span>
+                <span></span>
               </span>
-              <span className="menu-label">Menu</span>
             </button>
           </div>
         </div>
 
-        {/* Dropdown Panel - Contains Navigation + Wallet */}
-        <div className={`unified-dropdown ${isMenuOpen ? 'active' : ''}`}>
+        {/* Mobile Dropdown - Only visible on mobile when open */}
+        <div className={`mobile-dropdown ${isMenuOpen ? 'active' : ''}`}>
           <div className="dropdown-content">
             {/* Navigation Links */}
             <nav className="dropdown-nav">
-              <div className="nav-section-title">Navigation</div>
               {navLinks.map((link, index) => {
                 const isExternal = link.href.startsWith('http');
                 
@@ -89,7 +123,7 @@ const Header: React.FC<HeaderProps> = ({
               })}
             </nav>
 
-            {/* Wallet Section */}
+            {/* Mobile Wallet Section */}
             <div className="wallet-section">
               <div className="wallet-divider"></div>
               <div className="wallet-wrapper">
@@ -100,7 +134,7 @@ const Header: React.FC<HeaderProps> = ({
         </div>
       </header>
 
-      {/* Overlay - Outside header to cover entire page */}
+      {/* Mobile Overlay */}
       {isMenuOpen && (
         <div 
           className="menu-overlay"
